@@ -61,6 +61,7 @@ class ClicsModel(
 
     fun Team.toApi(): TeamInfo {
         val teamOrganization = organization_id?.let { organisations[it] }
+        //println(photo)
         return TeamInfo(
             id = liveTeamId(id),
             name = teamName(teamOrganization?.formalName, name),
@@ -70,7 +71,7 @@ class ClicsModel(
             groups = group_ids.mapNotNull { groups[it]?.name },
             hashTag = teamOrganization?.hashtag,
             medias = buildMap {
-                photo.firstOrNull()?.mediaType()?.let { put(TeamMediaType.PHOTO, it) }
+                photo.lastOrNull()?.mediaType()?.let { put(TeamMediaType.PHOTO, it) }
                 video.firstOrNull()?.mediaType()?.let { put(TeamMediaType.RECORD, it) }
                 webcam.firstOrNull()?.mediaType()?.let { put(TeamMediaType.CAMERA, it) }
                 desktop.firstOrNull()?.mediaType()?.let { put(TeamMediaType.SCREEN, it) }
@@ -142,7 +143,7 @@ class ClicsModel(
         } else {
             require(id == team.id)
             teams[id] = team
-            setTeamHidden(team.id, team.is_hidden || team.group_ids.any { groups[it]?.name in hiddenGroups })
+            setTeamHidden(team.id, team.is_hidden || !team.group_ids.any { groups[it]?.name in hiddenGroups })
         }
         return emptyList()
     }
